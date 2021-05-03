@@ -716,7 +716,7 @@ if(![System.IO.File]::Exists("$WorkDir\Updater")) {
 Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater"
 Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
 Environment]::Exit(0)
-}
+}}
 
 function GameStreamAfterReboot {
     if(Get-ScheduledTask | Where-Object {$_.TaskName -like "ContinueAWSGamingScript" }) {Unregister-ScheduledTask -TaskName "ContinueAWSGamingScript" -Confirm:$false}
