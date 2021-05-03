@@ -317,6 +317,8 @@ if(!($osType.Caption -like "*Windows Server 2012 R2*")) {RestorePhotoViewer | Ou
     Set-Wallpaper "$env:SystemRoot\Web\Wallpaper\AWSWallpaper.png"
 # Extract DirectX Archive to C:\Windows when OS is Server 2012 R2
     if ($osType.Caption -like "*Windows Server 2012 R2*") {Expand-Archive -Path 'C:\AWSTools\DirectXWK12.zip' -DestinationPath 'C:\Windows' -Force}
+# Delete AWS weblinks on the Desktop
+    Remove-Item -Path $env:USERPROFILE\Desktop\* -Include *.website
 }
 
 function Set-SecureAutoLogon {
