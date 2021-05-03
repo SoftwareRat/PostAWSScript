@@ -709,7 +709,7 @@ function CheckForDrivers {
 
 function InstallDrivers {
 $Shell = New-Object -comObject WScript.Shell
-$Shortcut = $Shell.CreateShortcut("$userpath\Desktop\AutomateCloudGaming_Continue.lnk")
+$Shortcut = $Shell.CreateShortcut("$env:userprofile\Desktop\AutomateCloudGaming_Continue.lnk")
 $Shortcut.TargetPath = "powershell.exe"
 $Shortcut.Arguments = "-Command `"Set-ExecutionPolicy Unrestricted; & '$PSScriptRoot\PostNV6.ps1'`" -drivers"
 $Shortcut.Save()
@@ -718,6 +718,7 @@ if(![System.IO.File]::Exists("$WorkDir\Updater")) {
 Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater"
 Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
 Environment]::Exit(0)
+EXIT
 }}
 
 function GameStreamAfterReboot {
