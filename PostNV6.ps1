@@ -10,14 +10,14 @@ if(!$MoonlightAfterReboot) {
         Rename-Item -Path "C:\AWSTools\logs\ScriptReboot.log" -NewName 'ScriptRebootOLD.log'
     } if((Test-Path -Path "C:\AWSTools\logs\ScriptRebootOLD.log") -eq $true) {
     Remove-Item -Path "C:\AWSTools\logs\ScriptRebootOLD.log"
-} Start-Transcript -Path "C:\AWSTools\logs\ScriptReboot.log"} 
-
-# Start logging for this script first-time
+} Start-Transcript -Path "C:\AWSTools\logs\ScriptReboot.log"
+} else { # Start logging for this script first-time
 if((Test-Path -Path "C:\AWSTools\logs\ScriptOLD.log") -eq $true) {
     Remove-Item -Path "C:\AWSTools\logs\ScriptOLD.log"
 } if((Test-Path -Path "C:\AWSTools\logs\script.log") -eq $true) {
     Rename-Item -Path "C:\AWSTools\logs\script.log" -NewName 'ScriptOLD.log'
 } Start-Transcript -Path "C:\AWSTools\logs\script.log"
+}
 
 # Setting function to test for existance of Registry valves
 function Test-RegistryValue {
