@@ -26,19 +26,7 @@
 - Server 2019
 
 ### CLOUD SKU: 
-<<<<<<< HEAD:Release/README.md
 G4dn-based instances
-=======
-- Standard_NC4as_T4_v3
-- NV6_Standard
-- NV6_Promo
-
-### TO-DO LIST: 
-- Porting this script to Amazon Web Services or Google Cloud
-- Supporting other then Cloud SKU's based on NV6
-- This Script is currently supporting OS for servers only. Support adding for Windows 10 soon 
-- Supporting Parsec
->>>>>>> 95a1155a1843f239fbc0ca9c8cbb7dfcc22b4ac3:README.md
 
 ## Show your support
 ***
