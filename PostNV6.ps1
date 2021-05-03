@@ -927,6 +927,8 @@ if(!$MoonlightAfterReboot) {
     "CheckForRDP",
     "TestForAWS",
     "CheckOSsupport",
+    "DownloadNVIDIAdrivers",
+    "InstallDrivers",
     "SetWindowsSettings",
     "EnableAudio",
     "ManageWindowsFeatures",
@@ -935,11 +937,8 @@ if(!$MoonlightAfterReboot) {
     "InstallChocolatey",
     "InstallGameLaunchers",
     "InstallCommonSoftware",
-    "DisableFloppyAndCDROM",
-    "DownloadNVIDIAdrivers",
-    "InstallDrivers"
-)
-} else {
+    "DisableFloppyAndCDROM"
+)} else {
     $ScripttaskListAfterReboot = (
     "CheckForRDP",
     "TestForAWS",
