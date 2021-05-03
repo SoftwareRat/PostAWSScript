@@ -10,14 +10,12 @@ if(!$MoonlightAfterReboot) {
         Rename-Item -Path "C:\AWSTools\logs\ScriptReboot.log" -NewName 'ScriptRebootOLD.log'
     } if((Test-Path -Path "C:\AWSTools\logs\ScriptRebootOLD.log") -eq $true) {
     Remove-Item -Path "C:\AWSTools\logs\ScriptRebootOLD.log"
-} Start-Transcript -Path "C:\AWSTools\logs\ScriptReboot.log"
-} else { # Start logging for this script first-time
+} Start-Transcript -Path "C:\AWSTools\logs\ScriptReboot.log"} else { # Start logging for this script first-time
 if((Test-Path -Path "C:\AWSTools\logs\ScriptOLD.log") -eq $true) {
     Remove-Item -Path "C:\AWSTools\logs\ScriptOLD.log"
 } if((Test-Path -Path "C:\AWSTools\logs\script.log") -eq $true) {
     Rename-Item -Path "C:\AWSTools\logs\script.log" -NewName 'ScriptOLD.log'
-} Start-Transcript -Path "C:\AWSTools\logs\script.log"
-}
+} Start-Transcript -Path "C:\AWSTools\logs\script.log"}
 
 # Setting function to test for existance of Registry valves
 function Test-RegistryValue {
@@ -715,7 +713,7 @@ $Shortcut.Arguments = "-Command `"Set-ExecutionPolicy Unrestricted; & '$PSScript
 $Shortcut.Save()
 (New-Object System.Net.WebClient).DownloadFile("https://github.com/jamesstringerparsec/Cloud-GPU-Updater/archive/master.zip", "$WorkDir\updater.zip")          
 if(![System.IO.File]::Exists("$WorkDir\Updater")) {
-Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater"
+Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater" -Force
 Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
 Environment]::Exit(0)
 EXIT
@@ -930,7 +928,7 @@ if(!$MoonlightAfterReboot) {
     "CheckForRDP",
     "TestForAWS",
     "CheckOSsupport",
-    "DownloadNVIDIAdrivers",
+    "CheckForDrivers",
     "InstallDrivers",
     "SetWindowsSettings",
     "EnableAudio",
