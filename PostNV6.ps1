@@ -4,7 +4,7 @@ param (
     [switch]$nvdrivers = $false
 )
 
-if(!$MoonlightAfterReboot) {
+if(($MoonlightAfterReboot)) {
     # Start logging for this script after reboot
     if((Test-Path -Path "C:\AWSTools\logs\ScriptReboot.log") -eq $true) {
         Rename-Item -Path "C:\AWSTools\logs\ScriptReboot.log" -NewName 'ScriptRebootOLD.log'
