@@ -713,7 +713,7 @@ $Shortcut = $Shell.CreateShortcut("$userpath\Desktop\AutomateCloudGaming_Continu
 $Shortcut.TargetPath = "powershell.exe"
 $Shortcut.Arguments = "-Command `"Set-ExecutionPolicy Unrestricted; & '$PSScriptRoot\PostNV6.ps1'`" -drivers"
 $Shortcut.Save()
-Download-File "https://github.com/jamesstringerparsec/Cloud-GPU-Updater/archive/master.zip" "$WorkDir\updater.zip" "Cloud GPU Updater"          
+(New-Object System.Net.WebClient).DownloadFile("https://github.com/jamesstringerparsec/Cloud-GPU-Updater/archive/master.zip", "$WorkDir\updater.zip")          
 if(![System.IO.File]::Exists("$WorkDir\Updater")) {
 Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater"
 Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
