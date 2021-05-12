@@ -101,12 +101,6 @@ function ManageWindowsFeatures {
         # Installing Desktop Experience for more PC features
             Write-Output -InputObject 'Installling Desktop Experience...'
             Install-WindowsFeature -Name 'Desktop-Experience' | Out-Null
-        # Installing Group Policy Management for better administration
-            Write-Output -InputObject 'Installling Group Policy Management...'
-            Get-WindowsFeature -Name "*GPMC*" | Install-WindowsFeature | Out-Null
-        # Installing BITS for some network tasks
-            Write-Output -InputObject 'Installling Background Intelligent Transfer Service...'
-            Install-WindowsFeature -Name "BITS" | Out-Null
         }
     
     # Uninstalling Windows Defender on Windows Server 2016 and 2019 for saving resources
@@ -134,11 +128,14 @@ function ManageWindowsFeatures {
 function InstallChocolatey {
     # Download and install Chocolatey [Package Manager for Windows]
     Write-Output "Installing Chocolatey..."
+    ProgressWriter -Status "Installing Chocolatey" -PercentComplete $PercentComplete
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-WebRequest 'https://chocolatey.org/install.ps1' -UseBasicParsing | Invoke-Expression | Out-Null
-    # Enable executing PowerShell scripts silently without to confirm
-    Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "feature enable -n allowGlobalConfirmation" -Wait -NoNewWindow | Out-Null
+    (New-Object System.Net.WebClient).DownloadFile("https://chocolatey.org/install.ps1", "C:\AWSTools\ChocolateyInstall.ps1") | Out-Null
+    Start-Process 'powershell.exe' -Wait -WindowStyle Hidden -ArgumentList @('-command', '"C:\AWSTools\ChocolateyInstall.ps1"') | Out-Null
+    # Enable executing PowerShell scripts silently without needing to confirm
+    Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "feature enable -n allowGlobalConfirmation" -Wait -WindowStyle Hidden | Out-Null
+    Remove-Item -Path 'C:\AWSTools\ChocolateyInstall.ps1' -Force
 }
 
 function InstallGameLaunchers {
@@ -170,8 +167,8 @@ function InstallCommonSoftware {
         ProgressWriter -Status "Installing 7-Zip" -PercentComplete $PercentComplete
         Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install 7zip --limit-output" -Wait -NoNewWindow | Out-Null
     # Downloading and installing Microsoft Edge
-        ProgressWriter -Status "Installing Microsoft Edge" -PercentComplete $PercentComplete
-        Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install microsoft-edge --limit-output" -Wait -NoNewWindow | Out-Null
+        ProgressWriter -Status "Installing Mozilla Firefox" -PercentComplete $PercentComplete
+        Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install firefoxesr --limit-output" -Wait -NoNewWindow | Out-Null
     # Downloading and installing VLC Media Player
         ProgressWriter -Status "Installing VLC Media Player" -PercentComplete $PercentComplete
         Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install vlc --limit-output" -Wait -NoNewWindow | Out-Null
@@ -665,14 +662,6 @@ ProgressWriter -Status "Disabling non-NVIDIA GPUs" -PercentComplete $PercentComp
     }
 }
 
-function DisableFloppyAndCDROM {
-    ProgressWriter -Status "Disabling useless hardware" -PercentComplete $PercentComplete
-    # Disabling Floppy Disk drive
-        Start-Process -FilePath 'C:\AWSTools\devcon.exe' -ArgumentList 'disable "FDC\GENERIC_FLOPPY_DRIVE"' -Wait -NoNewWindow
-    # Disabling CDROM drive
-        Start-Process -FilePath 'C:\AWSTools\devcon.exe' -ArgumentList 'disable "GenCdRom"' -Wait -NoNewWindow
-}
-
 Function ProgressWriter {
     param (
     [int]$percentcomplete,
@@ -699,25 +688,25 @@ function BlockHost {
 
 function CheckForDrivers {
     if (!($nvdrivers)) {
-    if (!(Get-WmiObject Win32_PnPSignedDriver| select DeviceName, DriverVersion, Manufacturer | where {$_.DeviceName -like "*NVIDIA*"})) {
+    if (!(Get-WmiObject Win32_PnPSignedDriver| Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*NVIDIA*"})) {
         $UseExternalScript = (Read-Host "No GPU driver detected.`nWould you like to use the Cloud GPU Updater script by jamesstringerparsec?`nThe driver the script will install may or may not be compatible with this patch.`nA shortcut will be created in the Desktop to continue this installation after finishing the script. (y/n)").ToLower() -eq "y"
-        InstallDrivers
+        IF ($UseExternalScript) {InstallDrivers}
     }}
 }
 
 function InstallDrivers {
 $Shell = New-Object -comObject WScript.Shell
-$Shortcut = $Shell.CreateShortcut("$env:userprofile\Desktop\AutomateCloudGaming_Continue.lnk")
+$Shortcut = $Shell.CreateShortcut("$env:userprofile\Desktop\ContinueAWSScript.lnk")
 $Shortcut.TargetPath = "powershell.exe"
 $Shortcut.Arguments = "-Command `"Set-ExecutionPolicy Unrestricted; & '$PSScriptRoot\PostNV6.ps1'`" -drivers"
 $Shortcut.Save()
 (New-Object System.Net.WebClient).DownloadFile("https://github.com/jamesstringerparsec/Cloud-GPU-Updater/archive/master.zip", "$WorkDir\updater.zip")          
 if(![System.IO.File]::Exists("$WorkDir\Updater")) {
-Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater" -Force
+Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater" -Force}
 Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
-Environment]::Exit(0)
+[Environment]::Exit(0)
 EXIT
-}}
+}
 
 function GameStreamAfterReboot {
     if(Get-ScheduledTask | Where-Object {$_.TaskName -like "ContinueAWSGamingScript" }) {Unregister-ScheduledTask -TaskName "ContinueAWSGamingScript" -Confirm:$false}
@@ -914,9 +903,11 @@ $host.ui.RawUI.WindowTitle = "Automate AWS CloudGaming Tasks [Version 1.0.0]"
 # Set WScriptShell to create Desktop shortcuts
 $WScriptShell = New-Object -ComObject WScript.Shell
 # Asking for username password for configure autologin
-Write-Host -Object ('Enter your password for {0} to enable Autologon:' -f $env:USERNAME)
-$autologinpassword = (Read-Host -AsSecureString)
-Clear-Host
+if(!(Get-ItemPropertyValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Name 'AutoAdminLogon') -eq 1) {
+    Write-Host -Object ('Enter your password for {0} to enable Autologon:' -f $env:USERNAME)
+    $autologinpassword = (Read-Host -AsSecureString)
+    Clear-Host
+}
 Write-Host -ForegroundColor DarkRed -BackgroundColor Black '
 AWS Automation Gaming Script [Version 1.0.0]
 (c) 2021 SoftwareRat. All rights reserved.'
@@ -929,7 +920,6 @@ if(!$MoonlightAfterReboot) {
     "TestForAWS",
     "CheckOSsupport",
     "CheckForDrivers",
-    "InstallDrivers",
     "SetWindowsSettings",
     "EnableAudio",
     "ManageWindowsFeatures",
@@ -937,8 +927,7 @@ if(!$MoonlightAfterReboot) {
     "AddNewDisk",
     "InstallChocolatey",
     "InstallGameLaunchers",
-    "InstallCommonSoftware",
-    "DisableFloppyAndCDROM"
+    "InstallCommonSoftware"
 )} else {
     $ScripttaskListAfterReboot = (
     "CheckForRDP",
