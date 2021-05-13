@@ -166,12 +166,9 @@ function InstallCommonSoftware {
     # Downloading and installing 7-Zip
         ProgressWriter -Status "Installing 7-Zip" -PercentComplete $PercentComplete
         Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install 7zip --limit-output" -Wait -NoNewWindow | Out-Null
-    # Downloading and installing Microsoft Edge
+    # Downloading and installing Mozilla Firefox
         ProgressWriter -Status "Installing Mozilla Firefox" -PercentComplete $PercentComplete
         Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install firefoxesr --limit-output" -Wait -NoNewWindow | Out-Null
-    # Downloading and installing VLC Media Player
-        ProgressWriter -Status "Installing VLC Media Player" -PercentComplete $PercentComplete
-        Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install vlc --limit-output" -Wait -NoNewWindow | Out-Null
     # Downloading Microsoft Visual C++ Redist
         ProgressWriter -Status "Installing Microsoft Visual C++ Redist" -PercentComplete $PercentComplete
         Start-Process -FilePath "$env:PROGRAMDATA\chocolatey\bin\choco.exe" -ArgumentList "install vcredist140 --limit-output" -Wait -NoNewWindow | Out-Null
@@ -308,7 +305,7 @@ if(!($osType.Caption -like "*Windows Server 2012 R2*")) {RestorePhotoViewer | Ou
     if((Test-RegistryValue -Path 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Value '{20D04FE0-3AEA-1069-A2D8-08002B30309D}') -eq $true) {Set-ItemProperty -LiteralPath 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -Value 0 | Out-Null} Else {New-ItemProperty -LiteralPath 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{20D04FE0-3AEA-1069-A2D8-08002B30309D}' -Value 0 -PropertyType DWord -Force -ea SilentlyContinue | Out-Null}
     if((Test-RegistryValue -Path 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Value '{20D04FE0-3AEA-1069-A2D8-08002B30309D}') -eq $true) {Set-ItemProperty -LiteralPath 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -Value 0 | Out-Null} Else {New-ItemProperty -LiteralPath 'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}' -Value 0 -PropertyType DWord -Force -ea SilentlyContinue | Out-Null}
 # Change Wallpaper  
-    (New-Object System.Net.WebClient).DownloadFile("https://imgur.com/download/GtQtKhz/AWSWallpaper", "$env:SystemRoot\Web\Wallpaper\AWSWallpaper.png")
+    (New-Object System.Net.WebClient).DownloadFile("https://pixelfed.de/storage/m/_v2/298435563663527936/b84b52654-1eb8f9/ZsIe2txGsGXY/WF4YhNa7M9LGDKEFSHyNB0viE2E6hIvaNrEgYCrJ.png", "$env:SystemRoot\Web\Wallpaper\AWSWallpaper.png")
     Set-Wallpaper "$env:SystemRoot\Web\Wallpaper\AWSWallpaper.png"
 # Extract DirectX Archive to C:\Windows when OS is Server 2012 R2
     if ($osType.Caption -like "*Windows Server 2012 R2*") {Expand-Archive -Path 'C:\AWSTools\DirectXWK12.zip' -DestinationPath 'C:\Windows' -Force}
