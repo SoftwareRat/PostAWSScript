@@ -900,7 +900,7 @@ $host.ui.RawUI.WindowTitle = "Automate AWS CloudGaming Tasks [Version 1.0.0]"
 # Set WScriptShell to create Desktop shortcuts
 $WScriptShell = New-Object -ComObject WScript.Shell
 # Asking for username password for configure autologin
-if((Test-RegistryValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Value 'AutoAdminLogon') -eq $true){
+if(!(Test-RegistryValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Value 'AutoAdminLogon') -eq $true){
 if(!(Get-ItemPropertyValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Name 'AutoAdminLogon') -eq 1) {
     Write-Host -Object ('Enter your password for {0} to enable Autologon:' -f $env:USERNAME)
     $autologinpassword = (Read-Host -AsSecureString)
