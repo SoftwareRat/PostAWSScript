@@ -1,16 +1,9 @@
 # Setting argument for using Script after Reboot [Moonlight only]
 param (
-    [switch]$MoonlightAfterReboot = $false,
     [switch]$nvdrivers = $false
 )
 
-if(($MoonlightAfterReboot)) {
-    # Start logging for this script after reboot
-    if((Test-Path -Path "C:\AWSTools\logs\ScriptReboot.log") -eq $true) {
-        Rename-Item -Path "C:\AWSTools\logs\ScriptReboot.log" -NewName 'ScriptRebootOLD.log'
-    } if((Test-Path -Path "C:\AWSTools\logs\ScriptRebootOLD.log") -eq $true) {
-    Remove-Item -Path "C:\AWSTools\logs\ScriptRebootOLD.log"
-} Start-Transcript -Path "C:\AWSTools\logs\ScriptReboot.log"} else { # Start logging for this script first-time
+if(($nvdrivers)) {
 if((Test-Path -Path "C:\AWSTools\logs\ScriptOLD.log") -eq $true) {
     Remove-Item -Path "C:\AWSTools\logs\ScriptOLD.log"
 } if((Test-Path -Path "C:\AWSTools\logs\script.log") -eq $true) {
@@ -687,7 +680,7 @@ function CheckForDrivers {
     if (!($nvdrivers)) {
     if (!(Get-WmiObject Win32_PnPSignedDriver| Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*NVIDIA*"})) {
         $UseExternalScript = (Read-Host "No GPU driver detected.`nWould you like to use the Cloud GPU Updater script by jamesstringerparsec?`nThe driver the script will install may or may not be compatible with this patch.`nA shortcut will be created in the Desktop to continue this installation after finishing the script. (y/n)").ToLower() -eq "y"
-        IF ($UseExternalScript) {InstallDrivers}
+        IF ($UseExternalScript) {InstallDrivers} else {EXIT}
     }}
 }
 
@@ -700,7 +693,7 @@ $Shortcut.Save()
 (New-Object System.Net.WebClient).DownloadFile("https://github.com/jamesstringerparsec/Cloud-GPU-Updater/archive/master.zip", "$WorkDir\updater.zip")          
 if(![System.IO.File]::Exists("$WorkDir\Updater")) {
 Expand-Archive -Path "$WorkDir\updater.zip" -DestinationPath "$WorkDir\Updater" -Force}
-Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`""
+Start-Process -FilePath "powershell.exe" -ArgumentList "-Command `"$WorkDir\Updater\Cloud-GPU-Updater-master\GPUUpdaterTool.ps1`" -nvdrivers"
 [Environment]::Exit(0)
 EXIT
 }
@@ -900,12 +893,11 @@ $host.ui.RawUI.WindowTitle = "Automate AWS CloudGaming Tasks [Version 1.0.0]"
 # Set WScriptShell to create Desktop shortcuts
 $WScriptShell = New-Object -ComObject WScript.Shell
 # Asking for username password for configure autologin
-if(!(Test-RegistryValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Value 'AutoAdminLogon') -eq $true){
-$ErrorActionPreference="SilentlyContinue"
-    if(!(Get-ItemPropertyValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Name 'AutoAdminLogon') -eq 1) {
-    Write-Host -Object ('Enter your password for {0} to enable Autologon:' -f $env:USERNAME)
-    $autologinpassword = (Read-Host -AsSecureString)
-    Clear-Host
+if (($nvdrivers)) {
+if(!(Test-RegistryValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Value 'AutoAdminLogon') -eq $true -or (!(Get-ItemPropertyValue -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\' -Name 'AutoAdminLogon') -eq 1)) {
+Write-Host -Object ('Enter your password for {0} to enable Autologon:' -f $env:USERNAME)
+$autologinpassword = (Read-Host -AsSecureString)
+Clear-Host
 }}
 Write-Host -ForegroundColor DarkRed -BackgroundColor Black '
 AWS Automation Gaming Script [Version 1.0.0]
@@ -926,12 +918,7 @@ if(!$MoonlightAfterReboot) {
     "AddNewDisk",
     "InstallChocolatey",
     "InstallGameLaunchers",
-    "InstallCommonSoftware"
-)} else {
-    $ScripttaskListAfterReboot = (
-    "CheckForRDP",
-    "TestForAWS",
-    "CheckOSsupport",
+    "InstallCommonSoftware",
     "InstallGFE",
     "BlockHost",
     "GameStreamAfterReboot",
@@ -941,11 +928,6 @@ if(!$MoonlightAfterReboot) {
 
 foreach ($func in $ScripttaskList) {
     $PercentComplete =$($ScriptTaskList.IndexOf($func) / $ScripttaskList.Count * 100)
-    & $func $PercentComplete
-    }
-
-foreach ($func in $ScripttaskListAfterReboot) {
-    $PercentComplete =$($ScripttaskListAfterReboot.IndexOf($func) / $ScripttaskListAfterReboot.Count * 100)
     & $func $PercentComplete
     }
 
