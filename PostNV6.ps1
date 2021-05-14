@@ -903,10 +903,7 @@ Write-Host -ForegroundColor DarkRed -BackgroundColor Black '
 AWS Automation Gaming Script [Version 1.0.0]
 (c) 2021 SoftwareRat. All rights reserved.'
 
-if($MoonlightAfterReboot) {Write-Host -Object 'Continue script after reboot' -ForegroundColor Yellow}
-
-if(!$MoonlightAfterReboot) {
-    $ScripttaskList = (
+$ScripttaskList = (
     "CheckForRDP",
     "TestForAWS",
     "CheckOSsupport",
@@ -924,7 +921,7 @@ if(!$MoonlightAfterReboot) {
     "GameStreamAfterReboot",
     "DisableVGA",
     "StartupScript"
-)}
+)
 
 foreach ($func in $ScripttaskList) {
     $PercentComplete =$($ScriptTaskList.IndexOf($func) / $ScripttaskList.Count * 100)
@@ -942,4 +939,4 @@ Restart-Computer -Force
 Start-Sleep -Seconds 3
 Write-Warning 'Auto-Restart failed, please restart Windows manually'
 PAUSE
-[Environment]::Exit(0)
+[Environment]::Exit(2)
