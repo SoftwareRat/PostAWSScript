@@ -8,6 +8,9 @@
 
 > Automate to configure AWS instances for CloudGaming
 
+# UPDATE [11/06/2021]
+## This script has been discontinued because there will be an better script. Thank you for all the support :)
+
 ## Author
 
 👤 **SoftwareRat**
